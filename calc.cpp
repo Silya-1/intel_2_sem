@@ -3,34 +3,53 @@
 #include  <cstring>
 #include <cmath>
 #define size 2000
-double get_num();
-char* skip_space();
-double get_num();
-double get_p();
-double getexp();
-double getres();
-char *s;
+class CCALC
+{
+private:
+	char *s, *a;
+public:
+	CCALC(char *k);
+	~CCALC();
+	char* skip_space();
+	double get_num();
+	double get_p();
+	double getexp();
+	double getres();
+	double mul_div();
+};
+CCALC::CCALC(char *srs)
+{
+	s = new char[strlen(srs) + 1];
+	a = s;
+	strcpy(s, srs);
+};
+CCALC::~CCALC()
+{
+	delete [] a;
+	s = NULL;
+}
 int main()
 {
 	FILE*  file = fopen("calc.txt", "r");
 	char *strt = new char[size]; 
 	fgets(strt,size,file);
-	s = strt;
-	std::cout<< getres()<<::std::endl;
+	CCALC calc(strt);
+	std::cout<< calc.getres()<<::std::endl;
+	fclose(file);
 	delete[] strt;
 	return 0;
 }
 
-char* skip_space()
+char* CCALC::skip_space()
 {
 	while(*s == ' ' || *s == '\n')
 		s++;
 	return s;
 }
-double get_num()
+double CCALC::get_num()
 {
 	int show_ = 0;
-  	s = skip_space();
+  	s = this -> skip_space();
   	if(*s == '-')
 	{
   		show_ = -1;
@@ -38,7 +57,7 @@ double get_num()
   	}
   	else 
   		show_ = 1;
-	  s = skip_space();
+	  s = this -> skip_space();
 	  double res = 0;
 	  while(*s >= '0' && *s <= '9')
 	  {
@@ -48,18 +67,18 @@ double get_num()
 	  return res * show_;
 }
 
-double get_p()
+double CCALC::get_p()
 {
 	double a = 0;
-	s = skip_space();
+	s = this -> skip_space();
 	if(*s == '(')
 	{
 		s++;
-		a = getexp();
+		a = this -> getexp();
 	}
 	else if(*s >= '0' && *s <= '9')
 	{
-		a = get_num();
+		a = this -> get_num();
 		std::cout<<a<<std::endl;
 	}
 	else 
@@ -85,60 +104,59 @@ double get_p()
 	}
 	return a;
 }
-double mul_div()
+double CCALC::mul_div()
 {
-	s = skip_space();
-	double a = get_p();
-	s = skip_space();
+	s = this -> skip_space();
+	double a = this -> get_p();
+	s = this -> skip_space();
 	if(*s == '*')
 	{
 		s++;
-		a *= get_p();
-		s++;
+		a *= this -> get_p();
+		//s++;
 	}
 	else if(*s == '/')
 	{
 		s++;
-		a /= get_p();
-		s++;
+		a /= this -> get_p();
+		//s++;
 	}
 	else if(*s == '^')
 	{
 		s++;
-		int i = get_p();
-		std::cout << i<< " " << a<< " this is i and a"<<std::endl;
+		int i = this -> get_p();
 		for (int j = 1; j < i; j++)
 			a *= i;
 		if(i == 0)
 			a = 1;
-		std::cout << i<< " " << a<< " this is i and a"<<std::endl;
+		//s++;
 	}
 	return a;
 }
-double getexp()
+double CCALC::getexp()
 {
 	double a = 0; 
-	a = mul_div();
-	s = skip_space();
+	a = this -> mul_div();
+	s = this -> skip_space();
 	if(*s == '+')
 	{
 		s++;
-		a += mul_div();
+		a += this -> mul_div();
 	}
 	else if(*s == '-')
 	{
 		s++;
-		a -= mul_div();
+		a -= this -> mul_div();
 	}
 	if(*s == ')')
 		s++;	
-	s = skip_space();
+	s = this -> skip_space();
 	return a;
 }
-double getres()
+double CCALC::getres()
 {
 	double a = 0;
 	while(*s != '\0')
-		a += getexp();
+		a += this -> getexp();
 	return a;
 }
